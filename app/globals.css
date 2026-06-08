@@ -281,7 +281,6 @@ img {
 .highlight-card,
 .latest-post,
 .side-post,
-.topic-card,
 .subscribe-panel,
 .instagram-card,
 .gallery-card {
@@ -405,38 +404,6 @@ img {
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-}
-
-.topic-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.topic-card {
-  min-height: 166px;
-  padding: 24px 18px 20px;
-  text-align: center;
-}
-
-.topic-card img {
-  width: 54px;
-  height: 54px;
-  margin: 0 auto 14px;
-  object-fit: cover;
-  border-radius: 6px;
-}
-
-.topic-card h3 {
-  margin: 0 0 8px;
-  font-size: 1rem;
-}
-
-.topic-card p {
-  margin: 0;
-  color: #5f5a55;
-  font-size: 0.78rem;
-  line-height: 1.35;
 }
 
 .latest-heading-row {
@@ -667,7 +634,6 @@ img {
     grid-template-columns: 1fr;
   }
 
-  .topic-grid,
   .latest-grid,
   .social-gallery {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -756,14 +722,9 @@ img {
     height: 116px;
   }
 
-  .topic-grid,
   .latest-grid,
   .social-gallery {
     grid-template-columns: 1fr;
-  }
-
-  .topic-card {
-    min-height: auto;
   }
 
   .latest-image,

@@ -100,24 +100,6 @@ function SidePost({ blog }: { blog: BlogSummary }) {
   );
 }
 
-function TopicCard({ category, blog }: { category: string; blog?: BlogSummary }) {
-  const descriptions: Record<string, string> = {
-    "Buying a Home": "Search strategy, offer readiness, and touring guidance.",
-    "Selling a Home": "Prep, pricing, showings, and negotiation clarity.",
-    "Surrey Real Estate": "Local market context from the Woodhouse team.",
-    Guides: "Practical checklists for confident real estate moves.",
-    "Metro Vancouver": "Regional trends, neighborhoods, and planning notes."
-  };
-
-  return (
-    <a href="#latest" className="topic-card">
-      <img src={imageFor(blog)} alt="" />
-      <h3>{category}</h3>
-      <p>{descriptions[category] || "Curated insight for smarter property decisions."}</p>
-    </a>
-  );
-}
-
 function LatestPost({ blog }: { blog: BlogSummary }) {
   return (
     <article className="latest-post">
@@ -144,7 +126,6 @@ export default async function Home({ searchParams }: PageProps) {
   const highlightMain = blogs[4] || leadBlog;
   const sideHighlights = blogs.slice(5, 8);
   const latestPosts = blogs.slice(0, 6);
-  const topicBlogs = categories.map((category) => blogs.find((blog) => blog.categories?.includes(category)));
   const galleryImages = blogs.slice(0, 3);
 
   return (
@@ -156,7 +137,6 @@ export default async function Home({ searchParams }: PageProps) {
         <nav className="magazine-nav" aria-label="Primary navigation">
           <a href="https://www.stonegroup.ca/">Home</a>
           <a href="#latest">Articles</a>
-          <a href="#topics">Categories</a>
           <a href="https://www.stonegroup.ca/about">About</a>
         </nav>
         <a className="magazine-talk" href="https://www.stonegroup.ca/node/add/contactSite">
@@ -186,15 +166,6 @@ export default async function Home({ searchParams }: PageProps) {
                     <SidePost key={blog.id} blog={blog} />
                   ))}
                 </div>
-              </div>
-            </section>
-
-            <section className="magazine-section" id="topics" aria-labelledby="topics-heading">
-              <h2 id="topics-heading">Browse by topic</h2>
-              <div className="topic-grid">
-                {categories.map((category, index) => (
-                  <TopicCard key={category} category={category} blog={topicBlogs[index]} />
-                ))}
               </div>
             </section>
 
@@ -278,7 +249,6 @@ export default async function Home({ searchParams }: PageProps) {
         <nav aria-label="Quick links">
           <h2>Quick Link</h2>
           <a href="https://www.stonegroup.ca/">Homepage</a>
-          <a href="#topics">Categories</a>
           <a href="#latest">Articles</a>
           <a href="https://www.stonegroup.ca/node/add/contactSite">Contact us</a>
         </nav>
