@@ -65,41 +65,6 @@ function HeroFeature({ blog }: { blog: BlogSummary }) {
   );
 }
 
-function HighlightCard({ blog }: { blog: BlogSummary }) {
-  return (
-    <article className="highlight-card">
-      <Link href={`/blog/${blog.slug}`} className="highlight-image">
-        <img src={imageFor(blog)} alt="" />
-        <span className="post-pill">{labelFor(blog)}</span>
-      </Link>
-      <p className="post-meta">{metaLine(blog)}</p>
-      <h3>
-        <Link href={`/blog/${blog.slug}`}>{blog.title}</Link>
-      </h3>
-      <p>{excerptFor(blog)}</p>
-      <Link href={`/blog/${blog.slug}`} className="read-link">
-        Read More
-      </Link>
-    </article>
-  );
-}
-
-function SidePost({ blog }: { blog: BlogSummary }) {
-  return (
-    <Link href={`/blog/${blog.slug}`} className="side-post">
-      <div className="side-post-image">
-        <img src={imageFor(blog)} alt="" />
-        <span className="post-pill">{labelFor(blog)}</span>
-      </div>
-      <div>
-        <p className="post-meta">{metaLine(blog)}</p>
-        <h3>{blog.title}</h3>
-        <p>{excerptFor(blog)}</p>
-      </div>
-    </Link>
-  );
-}
-
 function LatestPost({ blog }: { blog: BlogSummary }) {
   return (
     <article className="latest-post">
@@ -123,8 +88,6 @@ export default async function Home({ searchParams }: PageProps) {
   const [leadBlog] = blogs;
   const categories = categoryList(blogs);
   const topStories = blogs.slice(1, 4);
-  const highlightMain = blogs[4] || leadBlog;
-  const sideHighlights = blogs.slice(5, 8);
   const latestPosts = blogs.slice(0, 6);
   const galleryImages = blogs.slice(0, 3);
 
@@ -155,18 +118,6 @@ export default async function Home({ searchParams }: PageProps) {
 
             <section className="feature-wrap" aria-label="Lead article">
               <HeroFeature blog={leadBlog} />
-            </section>
-
-            <section className="magazine-section" aria-labelledby="today-heading">
-              <h2 id="today-heading">Today&apos;s highlight</h2>
-              <div className="highlight-layout">
-                <HighlightCard blog={highlightMain} />
-                <div className="side-post-list">
-                  {sideHighlights.map((blog) => (
-                    <SidePost key={blog.id} blog={blog} />
-                  ))}
-                </div>
-              </div>
             </section>
 
             <section className="magazine-section" id="latest" aria-labelledby="latest-heading">
