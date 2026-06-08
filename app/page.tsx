@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getBlogs, formatDate, readingTime, type BlogSummary } from "../lib/blogs";
+import { getBlogs, formatDate, type BlogSummary } from "../lib/blogs";
 
 export const dynamic = "force-dynamic";
 
@@ -22,28 +22,114 @@ function categoryList(blogs: BlogSummary[]) {
   return Array.from(new Set(blogs.flatMap((blog) => blog.categories || []))).slice(0, 8);
 }
 
-function BlogCard({ blog, featured = false }: { blog: BlogSummary; featured?: boolean }) {
-  const image = blog.featuredImage || heroImage;
+function imageFor(blog?: BlogSummary) {
+  return blog?.featuredImage || heroImage;
+}
+
+function metaLine(blog: BlogSummary) {
+  return `${formatDate(blog.publishDate)} / ${blog.authorName || "Woodhouse Realty"}`;
+}
+
+function labelFor(blog?: BlogSummary) {
+  return blog?.categories?.[0] || "Real Estate";
+}
+
+function excerptFor(blog?: BlogSummary) {
+  return blog?.excerpt || "Local guidance for buying, selling, and planning your next real estate move.";
+}
+
+function TopStory({ blog }: { blog: BlogSummary }) {
+  return (
+    <Link href={`/blog/${blog.slug}`} className="top-story">
+      <img src={imageFor(blog)} alt="" />
+      <div>
+        <p>{metaLine(blog)}</p>
+        <h2>{blog.title}</h2>
+      </div>
+    </Link>
+  );
+}
+
+function HeroFeature({ blog }: { blog: BlogSummary }) {
+  return (
+    <Link href={`/blog/${blog.slug}`} className="hero-feature">
+      <img src={imageFor(blog)} alt="" />
+      <div className="hero-feature-scrim" />
+      <span className="post-pill">{labelFor(blog)}</span>
+      <div className="sponsored-pill">Woodhouse Insight</div>
+      <div className="hero-feature-copy">
+        <p>{metaLine(blog)}</p>
+        <h1>{blog.title}</h1>
+      </div>
+    </Link>
+  );
+}
+
+function HighlightCard({ blog }: { blog: BlogSummary }) {
+  return (
+    <article className="highlight-card">
+      <Link href={`/blog/${blog.slug}`} className="highlight-image">
+        <img src={imageFor(blog)} alt="" />
+        <span className="post-pill">{labelFor(blog)}</span>
+      </Link>
+      <p className="post-meta">{metaLine(blog)}</p>
+      <h3>
+        <Link href={`/blog/${blog.slug}`}>{blog.title}</Link>
+      </h3>
+      <p>{excerptFor(blog)}</p>
+      <Link href={`/blog/${blog.slug}`} className="read-link">
+        Read More
+      </Link>
+    </article>
+  );
+}
+
+function SidePost({ blog }: { blog: BlogSummary }) {
+  return (
+    <Link href={`/blog/${blog.slug}`} className="side-post">
+      <div className="side-post-image">
+        <img src={imageFor(blog)} alt="" />
+        <span className="post-pill">{labelFor(blog)}</span>
+      </div>
+      <div>
+        <p className="post-meta">{metaLine(blog)}</p>
+        <h3>{blog.title}</h3>
+        <p>{excerptFor(blog)}</p>
+      </div>
+    </Link>
+  );
+}
+
+function TopicCard({ category, blog }: { category: string; blog?: BlogSummary }) {
+  const descriptions: Record<string, string> = {
+    "Buying a Home": "Search strategy, offer readiness, and touring guidance.",
+    "Selling a Home": "Prep, pricing, showings, and negotiation clarity.",
+    "Surrey Real Estate": "Local market context from the Woodhouse team.",
+    Guides: "Practical checklists for confident real estate moves.",
+    "Metro Vancouver": "Regional trends, neighborhoods, and planning notes."
+  };
 
   return (
-    <article className={featured ? "blog-card blog-card-featured" : "blog-card"}>
-      <Link className="blog-image-link" href={`/blog/${blog.slug}`} aria-label={blog.title}>
-        <img src={image} alt="" className="blog-image" loading={featured ? "eager" : "lazy"} />
+    <a href="#latest" className="topic-card">
+      <img src={imageFor(blog)} alt="" />
+      <h3>{category}</h3>
+      <p>{descriptions[category] || "Curated insight for smarter property decisions."}</p>
+    </a>
+  );
+}
+
+function LatestPost({ blog }: { blog: BlogSummary }) {
+  return (
+    <article className="latest-post">
+      <Link href={`/blog/${blog.slug}`} className="latest-image">
+        <img src={imageFor(blog)} alt="" />
+        <span className="post-pill">{labelFor(blog)}</span>
       </Link>
-      <div className="blog-card-body">
-        <div className="eyebrow-row">
-          <span>{blog.categories?.[0] || "Real Estate Insight"}</span>
-          <span>{readingTime(blog)}</span>
-        </div>
-        <h3>
-          <Link href={`/blog/${blog.slug}`}>{blog.title}</Link>
-        </h3>
-        <p>{blog.excerpt || "Fresh guidance for buying, selling, and planning your next real estate move."}</p>
-        <div className="card-meta">
-          <span>{formatDate(blog.publishDate)}</span>
-          {blog.authorName ? <span>{blog.authorName}</span> : null}
-        </div>
-      </div>
+      <p className="post-meta">{metaLine(blog)}</p>
+      <h3>
+        <Link href={`/blog/${blog.slug}`}>{blog.title}</Link>
+      </h3>
+      <p>{excerptFor(blog)}</p>
     </article>
   );
 }
@@ -52,163 +138,158 @@ export default async function Home({ searchParams }: PageProps) {
   const params = await searchParams;
   const page = getPageNumber(params?.page);
   const { blogs, pagination } = await getBlogs(page, 9);
-  const [leadBlog, ...otherBlogs] = blogs;
+  const [leadBlog] = blogs;
   const categories = categoryList(blogs);
+  const topStories = blogs.slice(1, 4);
+  const highlightMain = blogs[4] || leadBlog;
+  const sideHighlights = blogs.slice(5, 8);
+  const latestPosts = blogs.slice(0, 6);
+  const topicBlogs = categories.map((category) => blogs.find((blog) => blog.categories?.includes(category)));
+  const galleryImages = blogs.slice(0, 3);
 
   return (
     <>
-      <header className="site-header">
-        <a href="https://www.stonegroup.ca/" className="brand" aria-label="Woodhouse Realty home">
+      <header className="magazine-header">
+        <a href="https://www.stonegroup.ca/" className="magazine-brand" aria-label="Woodhouse Realty home">
           <img src={logoUrl} alt="Woodhouse Realty" />
         </a>
-        <nav className="primary-nav" aria-label="Primary navigation">
+        <nav className="magazine-nav" aria-label="Primary navigation">
           <a href="https://www.stonegroup.ca/">Home</a>
-          <a href="https://www.stonegroup.ca/listings">Listings</a>
-          <a href="https://www.stonegroup.ca/buying">Buying</a>
-          <a href="https://www.stonegroup.ca/selling">Selling</a>
-          <a href="https://www.stonegroup.ca/node/add/contactSite">Contact</a>
+          <a href="#latest">Articles</a>
+          <a href="#topics">Categories</a>
+          <a href="https://www.stonegroup.ca/about">About</a>
         </nav>
-        <a className="phone-link" href="tel:604-547-3338">
-          604-547-3338
+        <a className="magazine-talk" href="https://www.stonegroup.ca/node/add/contactSite">
+          Let&apos;s Talk
         </a>
       </header>
 
-      <main>
-        <section className="hero" aria-label="Woodhouse Realty blog landing">
-          <img src={heroImage} alt="" className="hero-image" fetchPriority="high" />
-          <div className="hero-overlay" />
-          <div className="hero-content">
-            <p className="section-kicker">Woodhouse Realty Insights</p>
-            <h1>Local guidance for confident buying and selling.</h1>
-            <p>
-              Market notes, property search strategy, and practical Surrey real estate advice from the team behind
-              Woodhouse Realty.
-            </p>
-            <div className="hero-actions">
-              <a href="#latest" className="button button-primary">
-                Read Latest
-              </a>
-              <a href="https://www.stonegroup.ca/node/add/contactSite" className="button button-secondary">
-                Ask a Realtor
-              </a>
-            </div>
-          </div>
-        </section>
-
-        <section className="intro-band" aria-label="Blog highlights">
-          <div>
-            <span className="stat-value">{pagination.total}</span>
-            <span className="stat-label">published insights</span>
-          </div>
-          <div>
-            <span className="stat-value">Surrey</span>
-            <span className="stat-label">local brokerage perspective</span>
-          </div>
-          <div>
-            <span className="stat-value">5 min</span>
-            <span className="stat-label">API refresh window</span>
-          </div>
-        </section>
-
-        <section className="content-section" id="latest">
-          <div className="section-heading">
-            <p className="section-kicker">Latest Articles</p>
-            <h2>Clear next steps for the market you are in.</h2>
-            <p>
-              Browse buying guides, seller playbooks, valuation notes, and neighborhood-focused articles pulled directly
-              from Uplift.
-            </p>
-          </div>
-
-          {categories.length ? (
-            <div className="category-row" aria-label="Article categories">
-              {categories.map((category) => (
-                <span key={category}>{category}</span>
+      <main className="magazine-page">
+        {leadBlog ? (
+          <>
+            <section className="top-story-strip" aria-label="Featured articles">
+              {topStories.map((blog) => (
+                <TopStory key={blog.id} blog={blog} />
               ))}
-            </div>
-          ) : null}
+            </section>
 
-          {leadBlog ? (
-            <div className="featured-grid">
-              <BlogCard blog={leadBlog} featured />
-              <aside className="advisor-panel" aria-label="Woodhouse Realty contact">
-                <p className="section-kicker">Need a Local Read?</p>
-                <h2>Talk through timing before you make the next move.</h2>
-                <p>
-                  Get a quick consult on search alerts, home value, or sale prep from the Woodhouse Realty office in
-                  Surrey.
-                </p>
-                <a href="https://www.stonegroup.ca/node/add/contactSite" className="button button-dark">
-                  Contact Us
-                </a>
-              </aside>
-            </div>
-          ) : (
-            <div className="empty-state">
-              <h2>No published blogs found.</h2>
-              <p>When Uplift returns published articles, they will appear here automatically.</p>
-            </div>
-          )}
+            <section className="feature-wrap" aria-label="Lead article">
+              <HeroFeature blog={leadBlog} />
+            </section>
 
-          {otherBlogs.length ? (
-            <div className="blog-grid">
-              {otherBlogs.map((blog) => (
-                <BlogCard key={blog.id} blog={blog} />
+            <section className="magazine-section" aria-labelledby="today-heading">
+              <h2 id="today-heading">Today&apos;s highlight</h2>
+              <div className="highlight-layout">
+                <HighlightCard blog={highlightMain} />
+                <div className="side-post-list">
+                  {sideHighlights.map((blog) => (
+                    <SidePost key={blog.id} blog={blog} />
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <section className="magazine-section" id="topics" aria-labelledby="topics-heading">
+              <h2 id="topics-heading">Browse by topic</h2>
+              <div className="topic-grid">
+                {categories.map((category, index) => (
+                  <TopicCard key={category} category={category} blog={topicBlogs[index]} />
+                ))}
+              </div>
+            </section>
+
+            <section className="magazine-section" id="latest" aria-labelledby="latest-heading">
+              <div className="latest-heading-row">
+                <h2 id="latest-heading">Latest posts</h2>
+                <span>{pagination.total} published insights</span>
+              </div>
+              <div className="latest-grid">
+                {latestPosts.map((blog) => (
+                  <LatestPost key={blog.id} blog={blog} />
+                ))}
+              </div>
+              {pagination.totalPages > 1 ? (
+                <div className="pagination magazine-pagination" aria-label="Blog pagination">
+                  <Link
+                    aria-disabled={page <= 1}
+                    className={page <= 1 ? "disabled" : ""}
+                    href={`/?page=${Math.max(1, page - 1)}#latest`}
+                  >
+                    Previous
+                  </Link>
+                  <span>
+                    Page {pagination.page} of {pagination.totalPages}
+                  </span>
+                  <Link
+                    aria-disabled={page >= pagination.totalPages}
+                    className={page >= pagination.totalPages ? "disabled" : ""}
+                    href={`/?page=${Math.min(pagination.totalPages, page + 1)}#latest`}
+                  >
+                    Next
+                  </Link>
+                </div>
+              ) : null}
+            </section>
+
+            <section className="subscribe-panel" aria-label="Subscribe">
+              <div>
+                <h2>Subscribe now to stay updated with top news.</h2>
+                <p>Get market notes, buyer guides, and seller strategy from Woodhouse Realty.</p>
+              </div>
+              <form action="https://www.stonegroup.ca/node/add/contactSite">
+                <input type="email" name="email" placeholder="Enter your email" aria-label="Email address" />
+                <button type="submit" aria-label="Submit email">
+                  -&gt;
+                </button>
+                <small>By clicking submit, you agree to be contacted by Woodhouse Realty.</small>
+              </form>
+            </section>
+
+            <section className="social-gallery" aria-label="Woodhouse Realty visual stories">
+              <a className="instagram-card" href="https://www.stonegroup.ca/node/add/contactSite">
+                <span>WR</span>
+                <h2>Talk with Woodhouse Realty</h2>
+                <p>604-547-3338</p>
+              </a>
+              {galleryImages.map((blog) => (
+                <Link key={blog.id} href={`/blog/${blog.slug}`} className="gallery-card">
+                  <img src={imageFor(blog)} alt="" />
+                </Link>
               ))}
-            </div>
-          ) : null}
-
-          {pagination.totalPages > 1 ? (
-            <div className="pagination" aria-label="Blog pagination">
-              <Link
-                aria-disabled={page <= 1}
-                className={page <= 1 ? "disabled" : ""}
-                href={`/?page=${Math.max(1, page - 1)}#latest`}
-              >
-                Previous
-              </Link>
-              <span>
-                Page {pagination.page} of {pagination.totalPages}
-              </span>
-              <Link
-                aria-disabled={page >= pagination.totalPages}
-                className={page >= pagination.totalPages ? "disabled" : ""}
-                href={`/?page=${Math.min(pagination.totalPages, page + 1)}#latest`}
-              >
-                Next
-              </Link>
-            </div>
-          ) : null}
-        </section>
-
-        <section className="cta-band">
-          <div>
-            <p className="section-kicker">Woodhouse Realty</p>
-            <h2>Your ideal home is just a click away.</h2>
-          </div>
-          <div className="cta-actions">
-            <a href="https://www.stonegroup.ca/property-search" className="button button-primary">
-              Property Search
-            </a>
-            <a href="https://www.stonegroup.ca/free-home-evaluation" className="button button-light">
-              Home Evaluation
-            </a>
-          </div>
-        </section>
+            </section>
+          </>
+        ) : (
+          <section className="empty-state magazine-empty">
+            <h1>No published blogs found.</h1>
+            <p>When Uplift returns published articles, they will appear here automatically.</p>
+          </section>
+        )}
       </main>
 
-      <footer className="site-footer">
+      <footer className="magazine-footer">
         <div>
           <img src={logoUrl} alt="Woodhouse Realty" />
-          <p>102-6638 152 A Street, Surrey, British Columbia, V3S 7J1</p>
+          <p>
+            Local real estate articles, search guidance, and seller strategy from Woodhouse Realty in Surrey, British
+            Columbia.
+          </p>
+          <p className="footer-small">2026 Woodhouse Realty. All rights reserved.</p>
         </div>
-        <nav aria-label="Footer navigation">
-          <a href="https://www.stonegroup.ca/listings">Listings</a>
-          <a href="https://www.stonegroup.ca/buying">Buying</a>
-          <a href="https://www.stonegroup.ca/selling">Selling</a>
-          <a href="https://www.stonegroup.ca/node/add/contactSite">Contact Us</a>
+        <nav aria-label="Quick links">
+          <h2>Quick Link</h2>
+          <a href="https://www.stonegroup.ca/">Homepage</a>
+          <a href="#topics">Categories</a>
+          <a href="#latest">Articles</a>
+          <a href="https://www.stonegroup.ca/node/add/contactSite">Contact us</a>
         </nav>
-        <p className="disclaimer">Woodhouse Realty independently owned and operated.</p>
+        <nav aria-label="Real estate categories">
+          <h2>Category</h2>
+          {categories.slice(0, 5).map((category) => (
+            <a href="#latest" key={category}>
+              {category}
+            </a>
+          ))}
+        </nav>
       </footer>
     </>
   );
