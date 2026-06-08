@@ -82,6 +82,7 @@ export default async function BlogDetail({ params }: PageProps) {
 
       <main>
         <article className="article-shell">
+          <img src={image} alt="" className="article-image article-image-first" />
           <header className="article-hero">
             <Link href="/" className="back-link">
               Back to insights
@@ -95,7 +96,6 @@ export default async function BlogDetail({ params }: PageProps) {
             {blog.excerpt ? <p>{blog.excerpt}</p> : null}
             {blog.authorName ? <p className="author-line">By {blog.authorName}</p> : null}
           </header>
-          <img src={image} alt="" className="article-image" />
           <div className="article-layout">
             <aside className="article-aside">
               <img src={logoUrl} alt="Woodhouse Realty" />

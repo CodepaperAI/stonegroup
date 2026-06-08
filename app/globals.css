@@ -1241,10 +1241,11 @@ img {
 
 .article-shell {
   background: var(--paper);
+  padding-top: clamp(22px, 3vw, 38px);
 }
 
 .article-hero {
-  padding: clamp(56px, 8vw, 96px) clamp(18px, 6vw, 120px) 40px;
+  padding: clamp(24px, 4vw, 44px) clamp(18px, 6vw, 120px) 24px;
 }
 
 .back-link {
@@ -1261,16 +1262,16 @@ img {
 }
 
 .article-hero h1 {
-  max-width: 920px;
-  font-size: clamp(2.35rem, 5.4vw, 5rem);
-  line-height: 1.06;
+  max-width: 860px;
+  font-size: clamp(2rem, 4.2vw, 3.8rem);
+  line-height: 1.08;
 }
 
 .article-hero > p {
-  max-width: 760px;
+  max-width: 720px;
   color: var(--ink-soft);
-  font-size: 1.14rem;
-  line-height: 1.75;
+  font-size: 1.04rem;
+  line-height: 1.65;
 }
 
 .author-line {
@@ -1279,11 +1280,16 @@ img {
 
 .article-image {
   width: calc(100% - clamp(36px, 12vw, 240px));
-  max-height: 620px;
+  max-height: 500px;
   margin: 0 auto;
   object-fit: cover;
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
+}
+
+.article-image-first {
+  aspect-ratio: 16 / 6.5;
+  min-height: 300px;
 }
 
 .article-layout {
@@ -1292,7 +1298,7 @@ img {
   gap: clamp(32px, 6vw, 84px);
   align-items: start;
   justify-content: center;
-  padding: clamp(54px, 7vw, 92px) clamp(18px, 6vw, 120px);
+  padding: clamp(28px, 5vw, 58px) clamp(18px, 6vw, 120px) clamp(54px, 7vw, 92px);
 }
 
 .article-aside {
@@ -1311,10 +1317,17 @@ img {
   line-height: 1.6;
 }
 
+.article-aside,
+.article-content {
+  min-width: 0;
+}
+
 .article-content {
   color: var(--ink);
   font-size: 1.05rem;
   line-height: 1.82;
+  overflow-x: auto;
+  overflow-wrap: break-word;
 }
 
 .article-content > *:first-child {
@@ -1363,10 +1376,13 @@ img {
 }
 
 .article-content table {
+  display: block;
   width: 100%;
+  max-width: 100%;
   margin: 30px 0;
   border-collapse: collapse;
   font-size: 0.94rem;
+  overflow-x: auto;
 }
 
 .article-content th,
@@ -1424,7 +1440,12 @@ img {
   }
 
   .article-aside {
+    order: 2;
     position: static;
+  }
+
+  .article-content {
+    order: 1;
   }
 
   .disclaimer {
@@ -1482,6 +1503,19 @@ img {
 
   .article-image {
     width: calc(100% - 36px);
+  }
+
+  .article-image-first {
+    aspect-ratio: 4 / 3;
+    min-height: 220px;
+  }
+
+  .article-hero {
+    padding-top: 22px;
+  }
+
+  .article-hero h1 {
+    font-size: clamp(1.9rem, 8vw, 2.7rem);
   }
 
   .pagination {
