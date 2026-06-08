@@ -1261,8 +1261,9 @@ img {
 }
 
 .article-hero h1 {
-  max-width: 980px;
-  font-size: clamp(2.8rem, 7vw, 6.8rem);
+  max-width: 920px;
+  font-size: clamp(2.35rem, 5.4vw, 5rem);
+  line-height: 1.06;
 }
 
 .article-hero > p {
